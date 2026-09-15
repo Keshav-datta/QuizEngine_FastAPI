@@ -65,7 +65,6 @@ async def skip_question(
         data=attempt,
     )
 
-
 @router.post("/attempts/{attempt_id}/submit")
 async def submit_quiz(
     attempt_id: UUID,

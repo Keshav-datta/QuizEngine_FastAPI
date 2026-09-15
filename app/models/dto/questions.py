@@ -2,7 +2,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from app.models.enums_models import QuestionType
+from app.models.db.question import QuestionType
 
 
 class OptionRequest(BaseModel):

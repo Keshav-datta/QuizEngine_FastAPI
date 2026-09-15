@@ -4,7 +4,7 @@ from app.exceptions import InvalidCredentials, UserAlreadyExists
 from app.helpers.security import create_access_token
 from app.models.db.user import User
 from app.models.dto.auth import RegisterRequest, TokenResponse
-from app.models.enums_models import UserRole
+from app.models.db.user import UserRole
 from app.repositories.user_repository import UserRepo
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

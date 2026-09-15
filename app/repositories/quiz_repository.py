@@ -24,6 +24,14 @@ class QuizRepo:
         )
         return result.scalar_one_or_none()
 
+
+    async def get_all(self):
+        result = await self.db.execute(
+            select(Quiz)
+            .order_by(Quiz.id.desc())
+        )
+        return result.scalars().all()
+
     async def get_published(self):
         result = await self.db.execute(
             select(Quiz)

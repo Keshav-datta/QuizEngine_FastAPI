@@ -25,13 +25,26 @@ async def create_quiz(
         data=QuizResponse.model_validate(quiz),
     )
 
-
 @router.get("")
 async def get_quizzes(
     service: QuizService = Depends(get_quiz_service),
+    current_user: User = Depends(get_admin),
+):
+    quizzes = await service.get_all_quizzes()
+
+    return APIResponse(
+        success=True,
+        message="Quizzes fetched successfully",
+        data=[QuizResponse.model_validate(quiz) for quiz in quizzes],
+    )
+
+
+@router.get("/published")
+async def get_published_quizzes(
+    service: QuizService = Depends(get_quiz_service),
     current_user: User = Depends(get_current_user),
 ):
-    quizzes = await service.get_quizzes()
+    quizzes = await service.get_published_quizzes()
 
     return APIResponse(
         success=True,

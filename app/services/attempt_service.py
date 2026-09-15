@@ -5,8 +5,10 @@ from app.exceptions import AttemptAlreadyActive, AttemptExpired, AttemptNotActiv
 from app.exceptions import AttemptNotFound, AttemptNotOwned, InvalidAnswer
 from app.exceptions import QuizEmpty, QuizNotFound, QuizNotPublished
 from app.models.db.attempt import Answer, QuizAttempt
-from app.models.dto.attempts import AttemptResponse, AttemptResult, ReviewItem, ReviewResponse, ScoreResponse, SubmitAnswerRequest
-from app.models.enums_models import AttemptStatus, QuestionType, QuizStatus
+from app.models.dto.attempts import AttemptResponse, AttemptResult, ReviewItem, ReviewResponse, ScoreResponse,SubmitAnswerRequest, StartQuizResponse
+from app.models.db.attempt import AttemptStatus
+from app.models.db.question import QuestionType
+from app.models.db.quiz import QuizStatus
 from app.repositories.attempt_repository import AttemptRepo
 from app.repositories.question_repository import QuestionRepo
 from app.repositories.quiz_repository import QuizRepo
@@ -70,14 +72,16 @@ class AttemptService:
         await self.attempt_repo.db.commit()
         await self.attempt_repo.db.refresh(attempt)
 
-        return AttemptResponse(
+        return StartQuizResponse(
             public_id=attempt.public_id,
             quiz_id=quiz.public_id,
             started_at=attempt.started_at,
             expires_at=attempt.expires_at,
+            questions=questions,
             score=attempt.score,
             status=attempt.status,
         )
+
 
     async def submit_answer(self, attempt_public_id: UUID, data: SubmitAnswerRequest, user_id: int):
         attempt = await self.get_owned_attempt(attempt_public_id, user_id)
@@ -123,8 +127,8 @@ class AttemptService:
             answer = Answer(
                 attempt_id=attempt.id,
                 question_id=question.id,
-                selected_option_id=selected_option_id,
-                answer_text=None if question.type == QuestionType.MCQ else data.answer.strip(),
+                selected_option_id= selected_option_id,
+                answer_text= None if question.type == QuestionType.MCQ else data.answer.strip(),
                 is_correct=is_correct,
                 marks_awarded=marks,
             )
@@ -135,6 +139,7 @@ class AttemptService:
         await self.attempt_repo.db.refresh(attempt)
 
         return await self.build_attempt_response(attempt)
+
 
     async def skip_question(self, attempt_public_id: UUID, question_public_id: UUID, user_id: int):
         attempt = await self.get_owned_attempt(attempt_public_id, user_id)
@@ -157,6 +162,7 @@ class AttemptService:
 
         return await self.build_attempt_response(attempt)
 
+
     async def finalize_attempt(self, attempt_public_id: UUID, user_id: int):
         attempt = await self.get_owned_attempt(attempt_public_id, user_id)
 
@@ -171,6 +177,7 @@ class AttemptService:
         await self.attempt_repo.db.refresh(attempt)
         return await self.build_attempt_result(attempt)
 
+
     async def get_score(self, attempt_public_id: UUID, user_id: int):
         attempt = await self.get_owned_attempt(attempt_public_id, user_id)
 
@@ -179,6 +186,7 @@ class AttemptService:
             score=attempt.score,
             status=attempt.status,
         )
+
 
     async def get_review(self, attempt_public_id: UUID, user_id: int):
         attempt = await self.get_owned_attempt(attempt_public_id, user_id)
@@ -244,6 +252,7 @@ class AttemptService:
             items=items,
         )
 
+
     async def get_owned_attempt(self, attempt_public_id: UUID, user_id: int):
         attempt = await self.attempt_repo.get_by_public_id(attempt_public_id)
 
@@ -254,6 +263,7 @@ class AttemptService:
             raise AttemptNotOwned("This attempt does not belong to you", "ATTEMPT_NOT_OWNED")
 
         return attempt
+
 
     async def build_attempt_response(self, attempt: QuizAttempt):
         quiz = await self.quiz_repo.get_by_id(attempt.quiz_id)
@@ -267,6 +277,7 @@ class AttemptService:
             status=attempt.status,
         )
 
+
     async def build_attempt_result(self, attempt: QuizAttempt):
         quiz = await self.quiz_repo.get_by_id(attempt.quiz_id)
 
@@ -279,6 +290,7 @@ class AttemptService:
             score=attempt.score,
             status=attempt.status,
         )
+
 
     async def ensure_active(self, attempt: QuizAttempt):
         if attempt.status != AttemptStatus.IN_PROGRESS:

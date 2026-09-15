@@ -3,7 +3,8 @@ from uuid import UUID
 from app.exceptions import InvalidQuestionData, QuestionNotFound, QuestionNotOwned, QuizNotDraft, QuizNotFound
 from app.models.db.question import Question, QuestionOption
 from app.models.dto.questions import CreateQuestionRequest
-from app.models.enums_models import QuestionType, QuizStatus
+from app.models.db.question import  QuestionType
+from app.models.db.quiz import QuizStatus
 from app.repositories.question_repository import QuestionRepo
 from app.repositories.quiz_repository import QuizRepo
 

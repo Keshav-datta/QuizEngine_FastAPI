@@ -2,7 +2,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.enums_models import QuizStatus
+from app.models.db.quiz import QuizStatus
 
 
 class CreateQuizRequest(BaseModel):

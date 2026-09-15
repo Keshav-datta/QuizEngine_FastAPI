@@ -2,9 +2,16 @@ from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, Field
+from app.models.db.attempt import AttemptStatus
 
-from app.models.enums_models import AttemptStatus
-
+class StartQuizResponse(BaseModel):
+    public_id: UUID
+    quiz_id: UUID
+    started_at: datetime
+    expires_at: datetime
+    questions: list
+    score: float
+    status: AttemptStatus
 
 class SubmitAnswerRequest(BaseModel):
     question_id: UUID

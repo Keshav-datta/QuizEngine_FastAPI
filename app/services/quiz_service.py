@@ -3,7 +3,7 @@ from uuid import UUID
 from app.exceptions import QuizEmpty, QuizNotDraft, QuizNotFound, QuizNotOwned
 from app.models.db.quiz import Quiz
 from app.models.dto.quizzes import CreateQuizRequest, UpdateQuizRequest
-from app.models.enums_models import QuizStatus
+from app.models.db.quiz import QuizStatus
 from app.repositories.question_repository import QuestionRepo
 from app.repositories.quiz_repository import QuizRepo
 
@@ -26,7 +26,10 @@ class QuizService:
         await self.quiz_repo.db.refresh(quiz)
         return quiz
 
-    async def get_quizzes(self):
+    async def get_all_quizzes(self):
+        return await self.quiz_repo.get_all()
+
+    async def get_published_quizzes(self):
         return await self.quiz_repo.get_published()
 
     async def get_quiz(self, quiz_public_id: UUID):

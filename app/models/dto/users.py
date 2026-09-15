@@ -2,7 +2,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 
-from app.models.enums_models import UserRole
+from app.models.db.user import UserRole
 
 
 class UserResponse(BaseModel):
